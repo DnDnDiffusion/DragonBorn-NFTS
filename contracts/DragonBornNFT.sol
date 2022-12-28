@@ -48,8 +48,22 @@ contract DragonBornNFT is
 
     function createRpgCharacter(address player, string memory _tokenURI)
         public
+        onlyOwner
         returns (uint256)
     {
+        uint256 newItemId = _tokenIds.current();
+        _mint(player, newItemId);
+        _setTokenURI(newItemId, _tokenURI);
+        emit newCharacter(newItemId, player, _tokenURI);
+        _tokenIds.increment();
+        return newItemId;
+    }
+
+    function createRpgCharacterPublic(string memory _tokenURI)
+        public
+        returns (uint256)
+    {
+        address player = msg.sender;
         uint256 newItemId = _tokenIds.current();
         _mint(player, newItemId);
         _setTokenURI(newItemId, _tokenURI);
