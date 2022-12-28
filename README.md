@@ -1,3 +1,3 @@
-# NFTs For Dragonborn Project (DnDnDiffursion)
+# NFTs For Dragonborn Project (DnDnDiffusion)
 
 Simple NFT implementation for DragonBorn project.
