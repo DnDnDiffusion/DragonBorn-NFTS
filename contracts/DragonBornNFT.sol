@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Royalty.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./DefaultOperatorFilterer.sol";
+import "./OS/DefaultOperatorFilterer.sol";
 
 contract DragonBornNFT is
     ERC721URIStorage,
