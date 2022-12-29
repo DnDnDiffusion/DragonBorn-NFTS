@@ -60,11 +60,10 @@ contract DragonBornNFT is
     }
 
     function mint(string memory _tokenURI) public returns (uint256) {
-        address player = msg.sender;
         uint256 newItemId = _tokenIds.current();
-        _mint(player, newItemId);
+        _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, _tokenURI);
-        emit mint(newItemId, player, _tokenURI);
+        emit mint(newItemId, msg.sender, _tokenURI);
         _tokenIds.increment();
         return newItemId;
     }
