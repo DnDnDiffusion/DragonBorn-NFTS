@@ -7,12 +7,14 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Royalty.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./DefaultOperatorFilterer.sol";
 
 contract DragonBornNFT is
     ERC721URIStorage,
     Ownable,
     ERC721Royalty,
-    AccessControl
+    AccessControl,
+    DefaultOperatorFilterer
 {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -70,5 +72,32 @@ contract DragonBornNFT is
         emit newCharacter(newItemId, player, _tokenURI);
         _tokenIds.increment();
         return newItemId;
+    }
+
+    /** OPENSEA TOOLKIT OVERRIDES **/
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override(ERC721, IERC721) onlyAllowedOperator(from) {
+        super.transferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override(ERC721, IERC721) onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public override(ERC721, IERC721) onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId, data);
     }
 }
