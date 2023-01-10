@@ -3,20 +3,20 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Royalty.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./OS/DefaultOperatorFilterer.sol";
 
 contract DragonBornNFT is
     ERC721URIStorage,
     Ownable,
     ERC721Royalty,
-    AccessControl
+    DefaultOperatorFilterer
 {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    event newCharacter(uint256 tokenId, address player, string tokenURI);
+    event mint(uint256 tokenId, address player, string tokenURI);
 
     constructor() ERC721("DragonBornToken", "DBT") {}
 
@@ -40,35 +40,58 @@ contract DragonBornNFT is
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721Royalty, AccessControl)
+        override(ERC721, ERC721Royalty)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
     }
 
-    function createRpgCharacter(address player, string memory _tokenURI)
+    function devMint(string memory _tokenURI)
         public
         onlyOwner
         returns (uint256)
     {
         uint256 newItemId = _tokenIds.current();
-        _mint(player, newItemId);
+        _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, _tokenURI);
-        emit newCharacter(newItemId, player, _tokenURI);
+        emit mint(newItemId, msg.sender, _tokenURI);
         _tokenIds.increment();
         return newItemId;
     }
 
-    function createRpgCharacterPublic(string memory _tokenURI)
-        public
-        returns (uint256)
-    {
-        address player = msg.sender;
+    function mint(string memory _tokenURI) public returns (uint256) {
         uint256 newItemId = _tokenIds.current();
-        _mint(player, newItemId);
+        _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, _tokenURI);
-        emit newCharacter(newItemId, player, _tokenURI);
+        emit mint(newItemId, msg.sender, _tokenURI);
         _tokenIds.increment();
         return newItemId;
+    }
+
+    /** OPENSEA TOOLKIT OVERRIDES **/
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override(ERC721, IERC721) onlyAllowedOperator(from) {
+        super.transferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override(ERC721, IERC721) onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public override(ERC721, IERC721) onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId, data);
     }
 }
